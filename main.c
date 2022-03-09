@@ -6,6 +6,13 @@
 #include "windowmap.c"
 #include <gbdk/font.h>
 
+void jump(){
+    NR10_REG = 0x16;
+    NR11_REG = 0x40;
+    NR12_REG = 0x73;
+    NR13_REG = 0x00;
+    NR14_REG = 0xc3;
+}
 
 void main(){
     UINT8 currentSpriteIndex = 0;
@@ -39,35 +46,19 @@ void main(){
         switch(joypad()){
                 case J_LEFT:
                     scroll_sprite(0, -10, 0);
-                    NR10_REG = 0x16;
-                    NR11_REG = 0x40;
-                    NR12_REG = 0x73;
-                    NR13_REG = 0x00;
-                    NR14_REG = 0xc3;
+                    jump();
                     break;
                 case J_RIGHT:
                     scroll_sprite(0, 10, 0);
-                    NR10_REG = 0x16;
-                    NR11_REG = 0x40;
-                    NR12_REG = 0x73;
-                    NR13_REG = 0x00;
-                    NR14_REG = 0xc3;
+                    jump();
                     break;
                 case J_UP:
                     scroll_sprite(0, 0, -10);
-                    NR10_REG = 0x16;
-                    NR11_REG = 0x40;
-                    NR12_REG = 0x73;
-                    NR13_REG = 0x00;
-                    NR14_REG = 0xc3;
+                    jump();
                     break;
                 case J_DOWN:
                     scroll_sprite(0, 0, 10);
-                    NR10_REG = 0x16;
-                    NR11_REG = 0x40;
-                    NR12_REG = 0x73;
-                    NR13_REG = 0x00;
-                    NR14_REG = 0xc3;
+                    jump();
                     break;
         }
 
