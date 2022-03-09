@@ -11,6 +11,11 @@ void main(){
     UINT8 currentSpriteIndex = 0;
     font_t min_font;
 
+    //Register order matters
+    NR52_REG = 0x80; //turns on sound
+    NR50_REG = 0x77; // sets volume to max for left and right channel
+    NR51_REG = 0xFF; // turns on all 4 channels left and right
+
     font_init();
     min_font = font_load(font_min); //36 tiles
     font_set(min_font);
@@ -34,15 +39,35 @@ void main(){
         switch(joypad()){
                 case J_LEFT:
                     scroll_sprite(0, -10, 0);
+                    NR10_REG = 0x16;
+                    NR11_REG = 0x40;
+                    NR12_REG = 0x73;
+                    NR13_REG = 0x00;
+                    NR14_REG = 0xc3;
                     break;
                 case J_RIGHT:
                     scroll_sprite(0, 10, 0);
+                    NR10_REG = 0x16;
+                    NR11_REG = 0x40;
+                    NR12_REG = 0x73;
+                    NR13_REG = 0x00;
+                    NR14_REG = 0xc3;
                     break;
                 case J_UP:
                     scroll_sprite(0, 0, -10);
+                    NR10_REG = 0x16;
+                    NR11_REG = 0x40;
+                    NR12_REG = 0x73;
+                    NR13_REG = 0x00;
+                    NR14_REG = 0xc3;
                     break;
                 case J_DOWN:
                     scroll_sprite(0, 0, 10);
+                    NR10_REG = 0x16;
+                    NR11_REG = 0x40;
+                    NR12_REG = 0x73;
+                    NR13_REG = 0x00;
+                    NR14_REG = 0xc3;
                     break;
         }
 
