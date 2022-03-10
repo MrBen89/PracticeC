@@ -6,12 +6,56 @@
 #include "windowmap.c"
 #include <gbdk/font.h>
 
-void jump(){
+INT8 playerlocation[2]; //2 8 bit integers for x and y of player
+UINT8 currentSpeed;
+INT8 gravity = -2;
+UINT8 floorYPosition = 100;
+BYTE jumping;
+
+void soundJump(){
     NR10_REG = 0x16;
     NR11_REG = 0x40;
     NR12_REG = 0x73;
     NR13_REG = 0x00;
     NR14_REG = 0xc3;
+}
+
+INT8 wouldHitSurface(UINT8 projectedYPosition){
+    if(projectedYPosition >= floorYPosition){
+        return floorYPosition;
+    }
+    return -1;
+}
+
+void jump(UINT8 spriteID, UINT8 spriteLocation[2]){
+    INT8 possibleYSurface;
+
+    if (jumping == 0) {
+        jumping=1;
+        currentSpeed = 10;
+    }
+
+    currentSpeed = currentSpeed + gravity;
+
+    spriteLocation[1] = spriteLocation[1] - currentSpeed;
+
+    possibleYSurface = wouldHitSurface(playerlocation[1]);
+
+    if (possibleYSurface > -1){
+        jumping = 0;
+        move_sprite(spriteID, spriteLocation[0], possibleYSurface);
+    }
+    else {
+        move_sprite(spriteID, spriteLocation[0], spriteLocation[1]);
+    }
+
+}
+
+void waitFor(UINT8 numloops){
+    UINT8 i;
+    for(i = 0; i < numloops; i++){
+        wait_vbl_done();
+    }
 }
 
 void main(){
@@ -35,7 +79,12 @@ void main(){
 
     set_sprite_data(0, 2, Slime);
     set_sprite_tile(0, 0);
-    move_sprite(0, 88, 78);
+
+    playerlocation[0] = 10;
+    playerlocation[1] = floorYPosition;
+    jumping = 0;
+
+    move_sprite(0, playerlocation[0], playerlocation[1]);
     SHOW_SPRITES;
     SHOW_BKG;
     SHOW_WIN;
@@ -43,25 +92,6 @@ void main(){
 
     while(1){
         scroll_bkg(1,0);
-        switch(joypad()){
-                case J_LEFT:
-                    scroll_sprite(0, -10, 0);
-                    jump();
-                    break;
-                case J_RIGHT:
-                    scroll_sprite(0, 10, 0);
-                    jump();
-                    break;
-                case J_UP:
-                    scroll_sprite(0, 0, -10);
-                    jump();
-                    break;
-                case J_DOWN:
-                    scroll_sprite(0, 0, 10);
-                    jump();
-                    break;
-        }
-
         if(currentSpriteIndex == 0){
             currentSpriteIndex = 1;
         }
@@ -69,7 +99,20 @@ void main(){
             currentSpriteIndex = 0;
         }
         set_sprite_tile(0, currentSpriteIndex);
-        delay(500);
+        if((joypad() & J_A) || jumping ==1){
+            jump(0,playerlocation);
+        }
+        if (joypad() & J_LEFT){
+            playerlocation[0] = playerlocation[0] - 2;
+            move_sprite(0, playerlocation[0], playerlocation[1]);
+        }
+        if (joypad() & J_RIGHT){
+            playerlocation[0] = playerlocation[0] + 2;
+            move_sprite(0, playerlocation[0], playerlocation[1]);
+        }
+        waitFor(5);
+
 
     }
+
 }
