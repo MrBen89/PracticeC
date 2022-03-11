@@ -5,12 +5,62 @@
 #include "backgroundsheet.c"
 #include "windowmap.c"
 #include <gbdk/font.h>
+#include "GameChar.c"
 
 INT8 playerlocation[2]; //2 8 bit integers for x and y of player
 UINT8 currentSpeed;
 INT8 gravity = -2;
 UINT8 floorYPosition = 100;
 BYTE jumping;
+UBYTE spritesize = 8;
+
+struct GameCharacter ship;
+struct GameCharacter bug;
+
+void moveGameCharacter(struct GameCharacter* character, UINT8 x, UINT8 y){
+    move_sprite(character->spriteids[0], x, y);
+    move_sprite(character->spriteids[1], x + spritesize, y);
+    move_sprite(character->spriteids[0], x, y + spritesize);
+    move_sprite(character->spriteids[0], x + spritesize, y + spritesize);
+}
+
+void setupShip(){
+    ship.x =80;
+    ship.y = 130;
+    ship.width = 16;
+    ship.height = 16;
+
+    set_sprite_tile(0,0);
+    ship.spriteids[0] = 0;
+    set_sprite_tile(1,1);
+    ship.spriteids[1] = 1;
+    set_sprite_tile(2,2);
+    ship.spriteids[2] = 2;
+    set_sprite_tile(3,3);
+    ship.spriteids[3] = 3;
+
+    moveGameCharacter(&ship, ship.x, ship.y);
+
+}
+
+void setupBug(){
+    bug.x =80;
+    bug.y = 130;
+    bug.width = 16;
+    bug.height = 16;
+
+    set_sprite_tile(5,5);
+    bug.spriteids[0] = 5;
+    set_sprite_tile(6,6);
+    bug.spriteids[1] = 6;
+    set_sprite_tile(7,7);
+    bug.spriteids[2] = 7;
+    set_sprite_tile(8,8);
+    bug.spriteids[3] = 8;
+
+    moveGameCharacter(&bug, bug.x, bug.y);
+
+}
 
 void soundJump(){
     NR10_REG = 0x16;
@@ -62,6 +112,9 @@ void main(){
     UINT8 currentSpriteIndex = 0;
     font_t min_font;
 
+    setupBug();
+    setupShip();
+
     //Register order matters
     NR52_REG = 0x80; //turns on sound
     NR50_REG = 0x77; // sets volume to max for left and right channel
@@ -101,6 +154,7 @@ void main(){
         set_sprite_tile(0, currentSpriteIndex);
         if((joypad() & J_A) || jumping ==1){
             jump(0,playerlocation);
+            
         }
         if (joypad() & J_LEFT){
             playerlocation[0] = playerlocation[0] - 2;
